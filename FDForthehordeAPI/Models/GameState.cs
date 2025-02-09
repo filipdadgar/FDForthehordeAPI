@@ -37,7 +37,7 @@ namespace FDForthehordeAPI.Models
         public double X { get; set; }
         public double Y { get; set; }
         public double SpeedY { get; set; } = 3; // Example speed
-        public int HitPoints { get; set; } = 5; // Example hit points
+        public int HitPoints { get; set; } = 150; // Example hit points
     }
 
     public class Chest

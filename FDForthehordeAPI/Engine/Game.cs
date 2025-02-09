@@ -61,20 +61,20 @@ public class Game
         {
             _logger.LogInformation("Starting game loop");
         
-
-        if (_gameTimer == null && !_gameLoopRunning)
-        {
-            _gameTimer = new Timer(16); // ~60 frames per second
-            _gameTimer.Elapsed += GameLoopTick;
-            _gameTimer.AutoReset = true;
-            _gameTimer.Enabled = true;
-            _gameLoopRunning = true;
-        }
-        else if (_gameTimer != null && !_gameTimer.Enabled) // Restart if timer exists but is stopped
-        {
-            _gameTimer.Start();
-            _gameLoopRunning = true; // Ensure flag is set when restarting
-        }
+            _gameState = null;
+            if (_gameTimer == null && !_gameLoopRunning)
+            {
+                _gameTimer = new Timer(16); // ~60 frames per second
+                _gameTimer.Elapsed += GameLoopTick;
+                _gameTimer.AutoReset = true;
+                _gameTimer.Enabled = true;
+                _gameLoopRunning = true;
+            }
+            else if (_gameTimer != null && !_gameTimer.Enabled) // Restart if timer exists but is stopped
+            {
+                _gameTimer.Start();
+                _gameLoopRunning = true; // Ensure flag is set when restarting
+            }
         }
     }
 
@@ -149,13 +149,40 @@ public class Game
             _logger.LogInformation("Generating enemies");
             if (_random.Next(100) < 5)
             {
-                var newHorde = new Horde() { X = _random.Next(0, _gameState.ScreenWidth - 25 ), Y = 0, SpeedY = 1 };
+                int minSpawnX = 25; // Minimum X for horde spawn (25 from left edge)
+                int maxSpawnX = _gameState.ScreenWidth - 25; // Maximum X (25 from right edge)
+                int spawnableWidth = maxSpawnX - minSpawnX;
+
+                int hordeX;
+                if (spawnableWidth > 0) // Ensure spawnable width is positive
+                {
+                    hordeX = minSpawnX + _random.Next(0, spawnableWidth); // Spawn within safe zone
+                }
+                else
+                {
+                    hordeX = _random.Next(0, _gameState.ScreenWidth); // Fallback: full width if something is wrong (shouldn't happen if ScreenWidth > 50)
+                }
+
+
+                var newHorde = new Horde() { X = hordeX, Y = 0, SpeedY = 1 };
                 _gameState.Hordes.Add(newHorde);
                 _logger.LogInformation($"Horde generated at X: {newHorde.X}, Y: {newHorde.Y}");
             }
             if (_random.Next(1000) < 1)
             {
-                var newBoss = new Boss() { X = _random.Next(0, _gameState.ScreenWidth - 25 ), Y = 0, SpeedY = 0.5 };
+                int minBossSpawnX = 25; // Minimum X for boss spawn (25 from left edge)
+                int maxBossSpawnX = _gameState.ScreenWidth - 25; // Maximum X for boss spawn (25 from right edge)
+                 int bossSpawnableWidth = maxBossSpawnX - minBossSpawnX;
+                int bossX;
+                if (bossSpawnableWidth > 0)
+                {
+                     bossX = minBossSpawnX + _random.Next(0, bossSpawnableWidth);
+                }
+                else
+                {
+                    bossX = _random.Next(0, _gameState.ScreenWidth); // Fallback for boss spawn
+                }
+                var newBoss = new Boss() { X = bossX, Y = 0, SpeedY = 0.5 };
                 _gameState.Bosses.Add(newBoss);
                 _logger.LogInformation($"Boss generated at X: {newBoss.X}, Y: {newBoss.Y}");
             }
