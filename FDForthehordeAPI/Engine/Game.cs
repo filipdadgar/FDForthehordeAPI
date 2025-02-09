@@ -264,36 +264,49 @@ public class Game
         lock(_gameStateLock)
         {
             _logger.LogInformation("Handling chest interaction");
-            if (_gameState.Chest.Y > _gameState.Soldier.Y && _gameState.Chest.X == _gameState.Soldier.X && !_gameState.Chest.IsDestroyed)
+
+            // --- "Touch" based interaction ---
+            // Check for overlap (adjust the proximity range - e.g., 30 pixels)
+            if (Math.Abs(_gameState.Chest.X - _gameState.Soldier.X) < 30 && Math.Abs(_gameState.Chest.Y - _gameState.Soldier.Y) < 30 && !_gameState.Chest.IsDestroyed)
             {
-                _gameState.Chest.HitPoints--;
-                _logger.LogInformation($"Chest hit, HP: {_gameState.Chest.HitPoints}");
-                if (_gameState.Chest.HitPoints <= 0)
-                {
-                    _gameState.Chest.IsDestroyed = true;
-                    AwardBonus();
-                    _logger.LogInformation("Chest destroyed, bonus awarded");
-                }
+                _gameState.Chest.IsDestroyed = true; // Destroy immediately on touch
+                AwardBonus();
+                _logger.LogInformation("Chest touched and destroyed, bonus awarded");
+                RespawnChest(); // Call RespawnChest immediately after awarding bonus
             }
-            if (_gameState.Chest.Y > _gameState.ScreenHeight && !_gameState.Chest.IsDestroyed)
+            else if (_gameState.Chest.Y > _gameState.ScreenHeight && !_gameState.Chest.IsDestroyed)
             {
-                _gameState.Chest = new Chest() { X = _random.Next(0, _gameState.ScreenWidth - 25), Y = 50, IsDestroyed = false, HitPoints = 5, Bonus = BonusType.None };
-                _logger.LogInformation("Chest respawned");
+                RespawnChest(); // Respawn if chest goes off-screen (as before)
+                _logger.LogInformation("Chest respawned due to off-screen");
             }
         }
+    }
+
+    private void RespawnChest() // Separate method for respawning chest to keep code clean
+    {
+        _gameState.Chest = new Chest() { X = _random.Next(0, _gameState.ScreenWidth - 25), Y = 50, IsDestroyed = false, Bonus = BonusType.None };
+        _logger.LogInformation("Chest respawned");
     }
 
     private void AwardBonus()
     {
         BonusType bonus = (BonusType)_random.Next(1, Enum.GetValues(typeof(BonusType)).Length);
         _gameState.Chest.Bonus = bonus;
+        _gameState.ActiveBonus = bonus; // Set active bonus
+        _gameState.BonusEndTime = DateTime.UtcNow.AddSeconds(10); // Set bonus duration to 10 seconds
         switch (bonus)
         {
             case BonusType.MoreSoldiers:
-                _gameState.Message = "Bonus: More Soldiers! (Feature not implemented in this example)";
+                _gameState.Message = "Bonus: More Soldiers!";
+                // --- Add extra soldiers to BonusSoldiers list ---
+                if (_gameState.Soldier != null) // Ensure main soldier exists
+                {
+                    _gameState.BonusSoldiers.Add(new Soldier() { X = _gameState.Soldier.X - 50, Y = _gameState.Soldier.Y }); // Bonus soldier to the left
+                    _gameState.BonusSoldiers.Add(new Soldier() { X = _gameState.Soldier.X + 50, Y = _gameState.Soldier.Y }); // Bonus soldier to the right
+                }
                 break;
             case BonusType.PowerfulWeapon:
-                _gameState.Message = "Bonus: Powerful Weapon! (Feature not implemented in this example)";
+                _gameState.Message = "Bonus: Powerful Weapon!";
                 break;
             default:
                 _gameState.Message = "Bonus received!";

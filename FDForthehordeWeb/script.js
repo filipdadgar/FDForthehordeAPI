@@ -30,7 +30,7 @@ function stopGame() {
     console.log("Stopping game");
     gameLoopRunning = false; // Stop the animation loop
     // Optional: Send a request to backend to explicitly stop backend loop if needed
-    // fetch('http://localhost:5105/Game/stop', { method: 'POST' });
+    fetch('http://localhost:5105/Game/stop', { method: 'POST' });
     // No need to reset gameState to null here in frontend, backend will handle on next start
 }
 
@@ -79,6 +79,16 @@ function drawGame() {
             ctx.drawImage(soldierImg, gameState.soldier.x, gameState.soldier.y, 50, 50);
         };
 
+    }
+
+    if (gameState.bonusSoldiers && gameState.bonusSoldiers.length > 0) { // Draw bonus soldiers
+        gameState.bonusSoldiers.forEach(bonusSoldier => {
+            const soldierImg = new Image(); // Can reuse soldier image
+            soldierImg.src = 'soldier.png';
+            soldierImg.onload = () => {
+                ctx.drawImage(soldierImg, bonusSoldier.x, bonusSoldier.y, 50, 50);
+            };
+        });
     }
 
     // Draw hordes
