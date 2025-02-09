@@ -41,7 +41,7 @@ public class Game
             _logger.LogInformation("Initializing game data");
             _gameState = new GameState()
             {
-                Soldier = new Soldier() { X = 290, Y = 500 },
+                Soldier = new Soldier() { X = 150, Y = 500 },
                 Chest = new Chest() { X = _random.Next(0, 300), Y = 50 },
                 Hordes = new List<Horde>(), // Initialize Hordes list - CRITICAL FIX
                 Bosses = new List<Boss>(),  // Initialize Bosses list - CRITICAL FIX
@@ -80,11 +80,14 @@ public class Game
 
     private void StopGameLoop() // Added StopGameLoop method
     {
-        _logger.LogInformation("Stopping game loop");
-        if (_gameTimer != null && _gameTimer.Enabled)
+        lock (_gameStateLock)
         {
-            _gameTimer.Stop();
-            _gameLoopRunning = false;
+            _logger.LogInformation("Stopping game loop");
+            if (_gameTimer != null && _gameTimer.Enabled)
+            {
+                _gameTimer.Stop();
+                _gameLoopRunning = false;
+            }
         }
     }
 
@@ -146,13 +149,13 @@ public class Game
             _logger.LogInformation("Generating enemies");
             if (_random.Next(100) < 5)
             {
-                var newHorde = new Horde() { X = _random.Next(0, _gameState.ScreenWidth), Y = 0, SpeedY = 1 };
+                var newHorde = new Horde() { X = _random.Next(0, _gameState.ScreenWidth - 25 ), Y = 0, SpeedY = 1 };
                 _gameState.Hordes.Add(newHorde);
                 _logger.LogInformation($"Horde generated at X: {newHorde.X}, Y: {newHorde.Y}");
             }
             if (_random.Next(1000) < 1)
             {
-                var newBoss = new Boss() { X = _random.Next(0, _gameState.ScreenWidth), Y = 0, SpeedY = 0.5 };
+                var newBoss = new Boss() { X = _random.Next(0, _gameState.ScreenWidth - 25 ), Y = 0, SpeedY = 0.5 };
                 _gameState.Bosses.Add(newBoss);
                 _logger.LogInformation($"Boss generated at X: {newBoss.X}, Y: {newBoss.Y}");
             }
