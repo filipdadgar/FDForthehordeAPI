@@ -67,4 +67,12 @@ public class GameController : ControllerBase
 
         return Ok(currentState);
     }
+    
+    // In GameController.cs
+    [HttpPost("stop")]
+    public IActionResult StopGame()
+    {
+        _gameEngine.StopGameLoop();
+        return Ok(new { message = "Game stopped" });
+    }
 }

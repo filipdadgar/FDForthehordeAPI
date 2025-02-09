@@ -78,7 +78,7 @@ public class Game
         }
     }
 
-    private void StopGameLoop() // Added StopGameLoop method
+    internal void StopGameLoop() // Added StopGameLoop method
     {
         lock (_gameStateLock)
         {
