@@ -50,6 +50,7 @@ public class Game
                 HordeKills = 0,             // Reset scores
                 BossKills = 0,
                 Message = "",                // Clear messages
+                
             };
         }
     }
@@ -110,6 +111,7 @@ public class Game
             }
 
             MoveGameObjectsDown();
+            MoveShotsUpward();
             GenerateEnemies();
             HandleSoldierAttacks();
             HandleChestInteraction();
@@ -195,6 +197,9 @@ public class Game
         { 
             _logger.LogInformation("Handling soldier attacks");
             List<Horde> nextHordes = new List<Horde>(); // Create a *new* list for hordes to keep
+            
+            _gameState.Shots.Clear();
+            
             foreach (var horde in _gameState.Hordes)
             {
                 // --- Attack condition (range check for X) ---
@@ -203,6 +208,11 @@ public class Game
                     _logger.LogInformation($"Horde IN ATTACK ZONE! Horde X:{horde.X}, Y:{horde.Y}, SoldierX:{_gameState.Soldier.X}, SoldierY:{_gameState.Soldier.Y}");
                     horde.HitPoints--;
                     _logger.LogInformation($"Horde hit, HP: {horde.HitPoints}, HordeID: {horde.Id}");
+                    
+                    // --- Create a Moving Shot object ---
+                    _gameState.Shots.Add(new Shot { X = _gameState.Soldier.X, Y = _gameState.Soldier.Y - 20 }); // Start Y above soldier
+
+                    
                     if (horde.HitPoints > 0) // Keep horde only if hitpoints > 0
                     {
                         nextHordes.Add(horde); // Add horde to the *new* list if it survives
@@ -229,6 +239,8 @@ public class Game
                 if (Math.Abs(boss.X - _gameState.Soldier.X) <= 25 && boss.Y < _gameState.Soldier.Y && boss.Y > 0)
                 {
                     boss.HitPoints--;
+                    _gameState.Shots.Add(new Shot { X = _gameState.Soldier.X, Y = _gameState.Soldier.Y - 20 }); // Start Y above soldier
+
                     if (boss.HitPoints > 0)
                     {
                         nextBosses.Add(boss);
@@ -265,7 +277,7 @@ public class Game
             }
             if (_gameState.Chest.Y > _gameState.ScreenHeight && !_gameState.Chest.IsDestroyed)
             {
-                _gameState.Chest = new Chest() { X = _random.Next(0, _gameState.ScreenWidth), Y = 50, IsDestroyed = false, HitPoints = 5, Bonus = BonusType.None };
+                _gameState.Chest = new Chest() { X = _random.Next(0, _gameState.ScreenWidth - 25), Y = 50, IsDestroyed = false, HitPoints = 5, Bonus = BonusType.None };
                 _logger.LogInformation("Chest respawned");
             }
         }
@@ -321,6 +333,32 @@ public class Game
                     return; // Exit after game over
                 }
             }
+        }
+        
+    }
+    
+    private void MoveShotsUpward() // <-- ADD THIS NEW METHOD
+    {
+        lock (_gameStateLock)
+        {
+            _logger.LogInformation("Moving shots upward");
+            List<Shot> nextShots = new List<Shot>(); // Create a new list for shots that are still on screen
+            foreach (var shot in _gameState.Shots)
+            {
+                shot.Y += shot.SpeedY; // Move shot up
+
+                if (shot.Y >= -150 ) // Keep shots that are still visible (adjust -20 based on shot image size and desired off-screen removal point)
+                {
+                    nextShots.Add(shot); // Add shot to the new list if it's still on screen
+                    _logger.LogInformation($"Moving shot - Shot X:{shot.X}, Y:{shot.Y}");
+                }
+                else
+                {
+                    _logger.LogInformation($"Removing off-screen shot - Shot X:{shot.X}, Y:{shot.Y}");
+                    // Shot is off-screen, don't add it to nextShots (effectively removing it)
+                }
+            }
+            _gameState.Shots = nextShots; // Replace the old shots list with the new one containing only on-screen shots
         }
     }
 }

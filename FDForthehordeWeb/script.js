@@ -112,6 +112,17 @@ function drawGame() {
         };
     }
 
+    // --- Draw Shots ---
+    if (gameState.shots && gameState.shots.length > 0) {
+        gameState.shots.forEach(shot => {
+            const shotImg = new Image();
+            shotImg.src = 'shot.png';
+            shotImg.onload = () => {
+            ctx.drawImage(shotImg, shot.x, shot.y, 20, 20);
+            };
+        });
+    }
+
     // Update game info
     hordeKillsElement.textContent = gameState.hordeKills;
     bossKillsElement.textContent = gameState.bossKills;
