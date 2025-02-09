@@ -1,0 +1,6 @@
+﻿services:
+  fdforthehordeapi:
+    image: fdforthehordeapi
+    build:
+      context: .
+      dockerfile: FDForthehordeAPI/Dockerfile

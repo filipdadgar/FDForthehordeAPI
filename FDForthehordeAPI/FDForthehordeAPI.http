@@ -1,0 +1,6 @@
+@FDForthehordeAPI_HostAddress = http://localhost:5105
+
+GET {{FDForthehordeAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
