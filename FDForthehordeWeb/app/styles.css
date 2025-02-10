@@ -12,6 +12,9 @@ body {
 
 #game-container {
     position: relative;
+    display: flex; /* Add flex to game container */
+    flex-direction: column; /* Stack canvas and controls vertically */
+    align-items: center; /* Center items horizontally in container */
 }
 
 #game-canvas {
@@ -22,7 +25,32 @@ body {
     position: absolute;
     top: 10px;
     left: 10px;
+    text-align: left; /* Align game info text to the left */
 }
+
+#controls {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px; /* Add some space between canvas and buttons */
+}
+
+.touch-button {
+    padding: 15px 30px;
+    margin: 0 10px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    background-color: #555; /* Dark gray */
+    color: white;
+    cursor: pointer;
+    user-select: none; /* Prevent text selection on tap */
+    touch-action: manipulation; /* For better touch responsiveness */
+}
+
+.touch-button:active {
+    background-color: #777; /* Lighter gray when pressed */
+}
+
 
 .soldier {
     background-image: url('soldier.png');

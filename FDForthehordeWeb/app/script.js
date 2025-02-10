@@ -11,6 +11,30 @@ const apiurl = 'https://hordeapi-csexhfc9ekdda2ej.swedencentral-01.azurewebsites
 let gameState = null;
 let gameLoopRunning = false;
 
+// Get references to touch buttons
+const leftButton = document.getElementById('left-button');
+const rightButton = document.getElementById('right-button');
+
+// --- Touch and Mouse event listeners for left button ---
+leftButton.addEventListener('touchstart', (event) => {
+    event.preventDefault(); // Prevent default touch behavior
+    moveSoldier('left');
+});
+leftButton.addEventListener('mousedown', (event) => { // For desktop mouse clicks
+    event.preventDefault();
+    moveSoldier('left');
+});
+
+// --- Touch and Mouse event listeners for right button ---
+rightButton.addEventListener('touchstart', (event) => {
+    event.preventDefault(); // Prevent default touch behavior
+    moveSoldier('right');
+});
+rightButton.addEventListener('mousedown', (event) => { // For desktop mouse clicks
+    event.preventDefault();
+    moveSoldier('right');
+});
+
 startGameButton.addEventListener('click', startGame);
 
 async function startGame() {
@@ -130,7 +154,7 @@ function drawGame() {
             const shotImg = new Image();
             shotImg.src = 'shot.png';
             shotImg.onload = () => {
-            ctx.drawImage(shotImg, shot.x, shot.y, 20, 20);
+                ctx.drawImage(shotImg, shot.x, shot.y, 20, 20);
             };
         });
     }

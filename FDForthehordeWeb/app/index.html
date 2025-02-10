@@ -8,6 +8,8 @@
 </head>
 <body>
 <div id="game-info">
+    <h1>For The Horde - Use keyboard Left and Right or the buttons</h1>
+    <div id="game-stats">
     <p>Horde Kills: <span id="horde-kills">0</span></p>
     <p>Boss Kills: <span id="boss-kills">0</span></p>
     <p>Game Time: <span id="game-time">0</span></p>
@@ -16,6 +18,11 @@
     <div id="game-container">
 
         <canvas id="game-canvas" width="300" height="600"></canvas>
+
+        <div id="controls">
+            <button class="touch-button" id="left-button">Left</button>
+            <button class="touch-button" id="right-button">Right</button>
+        </div>
 
         <button id="start-game-button">Start Game</button>
     </div>
