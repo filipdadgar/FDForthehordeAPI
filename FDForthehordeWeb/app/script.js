@@ -5,24 +5,43 @@ const bossKillsElement = document.getElementById('boss-kills');
 const gameTimeElement = document.getElementById('game-time');
 const startGameButton = document.getElementById('start-game-button');
 const messageElement = document.getElementById('game-message');
+const controlsDiv = document.getElementById('controls');
+controlsDiv.style.display = isMobileDevice() ? 'flex' : 'none';
 
 const apiurl = 'https://hordeapi-csexhfc9ekdda2ej.swedencentral-01.azurewebsites.net';
 
 let gameState = null;
 let gameLoopRunning = false;
-let moveInterval; // Variable to store the movement interval timer
-let currentDirection = null; // Track current movement direction
+let touchStartX = null;
+let touchThreshold = 30;
 
-// Get reference to the movement control area
-const movementControl = document.getElementById('movement-control');
+// Get references to touch buttons
+const leftButton = document.getElementById('left-button');
+const rightButton = document.getElementById('right-button');
 
-// --- Touch and Mouse event listeners for movement control ---
-movementControl.addEventListener('touchstart', startMove);
-movementControl.addEventListener('mousedown', startMove);
-movementControl.addEventListener('touchend', stopMove);
-movementControl.addEventListener('mouseup', stopMove);
-movementControl.addEventListener('touchcancel', stopMove);
-movementControl.addEventListener('mouseleave', stopMove); // Stop if mouse leaves control area
+canvas.addEventListener('touchstart', handleTouchStart);
+canvas.addEventListener('touchmove', handleTouchMove);
+canvas.addEventListener('touchend', handleTouchEnd);
+
+// --- Touch and Mouse event listeners for left button ---
+leftButton.addEventListener('touchstart', (event) => {
+    event.preventDefault(); // Prevent default touch behavior
+    moveSoldier('left');
+});
+leftButton.addEventListener('mousedown', (event) => { // For desktop mouse clicks
+    event.preventDefault();
+    moveSoldier('left');
+});
+
+// --- Touch and Mouse event listeners for right button ---
+rightButton.addEventListener('touchstart', (event) => {
+    event.preventDefault(); // Prevent default touch behavior
+    moveSoldier('right');
+});
+rightButton.addEventListener('mousedown', (event) => { // For desktop mouse clicks
+    event.preventDefault();
+    moveSoldier('right');
+});
 
 startGameButton.addEventListener('click', startGame);
 
@@ -45,7 +64,6 @@ async function startGame() {
 function stopGame() {
     console.log("Stopping game");
     gameLoopRunning = false; // Stop the animation loop
-    stopMove(); // Ensure movement interval is cleared when game stops
     // Optional: Send a request to backend to explicitly stop backend loop if needed
     fetch(`${apiurl}/Game/stop`, { method: 'POST' });
 }
@@ -67,23 +85,18 @@ async function moveSoldier(direction) {
         return;
     }
 
-    // Only move if direction is different from current direction to prevent redundant calls
-    if (direction !== currentDirection) {
-        currentDirection = direction; // Update current direction
+    console.log(`Moving soldier ${direction}`);
+    const response = await fetch(`${apiurl}/Game/soldier/move`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ direction: direction })
+    });
 
-        console.log(`Moving soldier ${direction}`);
-        const response = await fetch(`${apiurl}/Game/soldier/move`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ direction: direction })
-        });
-
-        if (response.ok) {
-            gameState = await response.json();
-            console.log("Game state after moving soldier:", gameState);
-        } else {
-            console.error("Failed to move soldier:", response.statusText);
-        }
+    if (response.ok) {
+        gameState = await response.json();
+        console.log("Game state after moving soldier:", gameState);
+    } else {
+        console.error("Failed to move soldier:", response.statusText);
     }
 }
 
@@ -186,41 +199,32 @@ function setCanvasSize(screenWidth, screenHeight) {
     canvas.height = screenHeight;
 }
 
-function startMove(event) {
-    event.preventDefault(); // Prevent default touch/mouse behavior
-    let touchX;
+function handleTouchStart(event) {
+    event.preventDefault();
+    const touch = event.touches[0];
+    touchStartX = touch.clientX;
+}
 
-    if (event.type === 'touchstart') {
-        touchX = event.touches[0].clientX; // Get touch x coordinate
-    } else { // mousedown
-        touchX = event.clientX;           // Get mouse x coordinate
-    }
+function handleTouchMove(event) {
+    if (!touchStartX || !gameLoopRunning) return;
 
-    const controlRect = movementControl.getBoundingClientRect();
-    const controlCenterX = controlRect.left + controlRect.width / 2;
+    event.preventDefault();
+    const touch = event.touches[0];
+    const diffX = touch.clientX - touchStartX;
 
-    let direction;
-    if (touchX < controlCenterX) {
-        direction = 'left';
-    } else {
-        direction = 'right';
-    }
-    if (direction !== currentDirection) {
-        stopMove(); // Stop any existing interval before starting a new one
-        currentDirection = direction;
-        // Start continuous movement using setInterval
-        moveInterval = setInterval(() => {
-            moveSoldier(direction); // Call your existing moveSoldier function
-        }, 100); // Adjust interval (milliseconds) for movement speed
+    if (Math.abs(diffX) >= touchThreshold) {
+        moveSoldier(diffX > 0 ? 'right' : 'left');
+        touchStartX = touch.clientX; // Reset to allow continuous movement
     }
 }
 
-
-function stopMove() {
-    clearInterval(moveInterval); // Stop the continuous movement interval
-    currentDirection = null; // Reset current direction
+function handleTouchEnd() {
+    touchStartX = null;
 }
 
+function isMobileDevice() {
+    return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+}
 
 // Initial canvas size setup (optional - can be set in HTML)
 setCanvasSize(300, 600);

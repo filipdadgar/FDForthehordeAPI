@@ -33,41 +33,12 @@ body {
     text-align: left; /* Align game info text to the left */
 }
 
-/* styles.css (Add or Modify these rules - Make sure these are in your styles.css) */
-
 #controls {
     display: flex;
-    flex-direction: column; /* Stack movement-control and start button vertically */
-    align-items: center;
-    margin-top: 10px;
-    width: 100%;
-    max-width: 400px;
-}
-
-#movement-control {
-    width: 90%; /* Occupy most of the controls width */
-    max-width: 400px;
-    height: 60px; /* Height of the touch control area */
-    background-color: #444; /* Darker background for touch area */
-    border-radius: 15px;
-    margin-bottom: 10px; /* Space below the touch area */
-    cursor: pointer; /* Indicate it's interactive */
-    user-select: none;
-    touch-action: manipulation;
-    display: flex; /* To visually divide into zones (optional) */
-    position: relative; /* Required for pseudo-element positioning */
-}
-
-/* Optional: Visually divide touch area into Left and Right zones */
-#movement-control::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 50%; /* Middle line */
-    width: 2px; /* Line thickness */
-    background-color: #666; /* Slightly lighter line color */
-    transform: translateX(-50%); /* Center the line */
+    justify-content: center;
+    margin-top: 10px; /* Space above controls */
+    width: 100%; /* Controls take full width of container */
+    max-width: 400px; /* Limit controls width */
 }
 
 .touch-button {
@@ -142,4 +113,3 @@ body {
     width: 20px;
     height: 20px;
 }
-
