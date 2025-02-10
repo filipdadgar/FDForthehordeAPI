@@ -22,7 +22,7 @@ public class GameController : ControllerBase
     [HttpPost("start")]
     public ActionResult<GameState> StartNewGame()
     {
-        _logger.LogInformation("StartNewGame endpoint called");
+        // _logger.LogInformation("StartNewGame endpoint called");
         _gameEngine.StartGameLoop(); // Start game loop via engine
         return Ok(_gameEngine.GetGameState()); // Return initial game state
     }
@@ -30,7 +30,7 @@ public class GameController : ControllerBase
     [HttpGet("state")]
     public ActionResult<GameState> GetGameState()
     {
-        _logger.LogInformation("GetGameState endpoint called");
+        // _logger.LogInformation("GetGameState endpoint called");
         return Ok(_gameEngine.GetGameState());
     }
 
@@ -39,18 +39,18 @@ public class GameController : ControllerBase
     {
         if (model == null || string.IsNullOrEmpty(model.Direction))
         {
-            _logger.LogWarning("MoveSoldier: Invalid request model or direction is missing");
+           // _logger.LogWarning("MoveSoldier: Invalid request model or direction is missing");
             return BadRequest("Invalid request. Direction is required.");
         }
 
         string direction = model.Direction.ToLower();
 
-        _logger.LogInformation("MoveSoldier endpoint called, direction: {Direction}", direction);
+        // _logger.LogInformation("MoveSoldier endpoint called, direction: {Direction}", direction);
         GameState currentState = _gameEngine.GetGameState();
 
         if (currentState.IsGameOver) return BadRequest("Game Over");
 
-        _logger.LogInformation($"MoveSoldier - Soldier X before move: {currentState.Soldier.X}"); // <--- ADD THIS LOGGING
+        // _logger.LogInformation($"MoveSoldier - Soldier X before move: {currentState.Soldier.X}"); // <--- ADD THIS LOGGING
 
         int moveStep = 10;
         if (direction == "left")
@@ -63,7 +63,7 @@ public class GameController : ControllerBase
         }
         currentState.Soldier.X = Math.Max(0, Math.Min(currentState.ScreenWidth - 50, currentState.Soldier.X));
 
-        _logger.LogInformation("MoveSoldier - Soldier X after move: {SoldierX}", currentState.Soldier.X); // <--- ADD THIS LOGGING
+        // _logger.LogInformation("MoveSoldier - Soldier X after move: {SoldierX}", currentState.Soldier.X); // <--- ADD THIS LOGGING
 
         return Ok(currentState);
     }

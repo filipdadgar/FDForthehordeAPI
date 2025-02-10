@@ -1,7 +1,6 @@
 using System.Timers;
 using FDForthehordeAPI.Models;
 using Timer = System.Timers.Timer;
-using Microsoft.Extensions.Logging; // Make sure to include logging
 
 namespace FDForthehordeAPI.Engine;
 
@@ -24,10 +23,10 @@ public class Game
     {
         lock (_gameStateLock)
         {
-            _logger.LogInformation("Getting game state");
+           // _logger.LogInformation("Getting game state");
             if (_gameState == null)
             {
-                InitializeGameData(); // Call InitializeGameData here when _gameState is null
+                InitializeGameData(); 
             }
             return _gameState;
         }
@@ -43,14 +42,13 @@ public class Game
             {
                 Soldier = new Soldier() { X = 150, Y = 500 },
                 Chest = new Chest() { X = _random.Next(0, 300), Y = 50 },
-                Hordes = new List<Horde>(), // Initialize Hordes list - CRITICAL FIX
-                Bosses = new List<Boss>(),  // Initialize Bosses list - CRITICAL FIX
-                IsGameOver = false,         // Ensure game is NOT over at start
-                GameTime = TimeSpan.Zero,     // Reset game time
-                HordeKills = 0,             // Reset scores
+                Hordes = new List<Horde>(), 
+                Bosses = new List<Boss>(),  
+                IsGameOver = false,         
+                GameTime = TimeSpan.Zero,     
+                HordeKills = 0,             
                 BossKills = 0,
-                Message = "",                // Clear messages
-                
+                Message = "",                
             };
         }
     }
@@ -84,7 +82,7 @@ public class Game
         lock (_gameStateLock)
         {
             _logger.LogInformation("Stopping game loop");
-            if (_gameTimer != null && _gameTimer.Enabled)
+            if (_gameTimer.Enabled)
             {
                 _gameTimer.Stop();
                 _gameLoopRunning = false;
@@ -93,7 +91,7 @@ public class Game
     }
 
 
-    private void GameLoopTick(object sender, ElapsedEventArgs e)
+    private void GameLoopTick(object? sender, ElapsedEventArgs e)
     {
         UpdateGameState();
     }
@@ -102,11 +100,11 @@ public class Game
     {
         lock (_gameStateLock)
         {
-            _logger.LogInformation($"Updating game state - Start - Hordes count: {_gameState.Hordes.Count}, Bosses count: {_gameState.Bosses.Count}");
+           // _logger.LogInformation("Updating game state - Start - Hordes count: {HordesCount}, Bosses count: {BossesCount}", _gameState.Hordes.Count, _gameState.Bosses.Count);
 
             if (_gameState.IsGameOver) // <-- EARLY GAME OVER CHECK - Add this at the very beginning
             {
-                _logger.LogInformation("UpdateGameState: Game Over already set, exiting update.");
+                _logger.LogInformation("UpdateGameState: Game Over already set, exiting update");
                 return; // Exit immediately if game is already over
             }
 
@@ -117,7 +115,7 @@ public class Game
             HandleChestInteraction();
             CheckGameOver();
 
-            _logger.LogInformation($"Updating game state - End - Hordes count: {_gameState.Hordes.Count}, Bosses count: {_gameState.Bosses.Count}");
+            _logger.LogInformation("Updating game state - End - Hordes count: {HordesCount}, Bosses count: {BossesCount}", _gameState.Hordes.Count, _gameState.Bosses.Count);
 
             _gameState.GameTime += TimeSpan.FromMilliseconds(_gameTimer.Interval);
         }
@@ -125,30 +123,30 @@ public class Game
 
     private void MoveGameObjectsDown()
     {
-        lock (_gameStateLock) // <--- Add lock here
+        lock (_gameStateLock) 
         {
-            _logger.LogInformation("Moving game objects down");
+            // _logger.LogInformation("Moving game objects down");
             foreach (var horde in _gameState.Hordes)
             {
-                _logger.LogInformation($"Moving horde down - Before: {horde.X}, {horde.Y}");
+                // _logger.LogInformation("Moving horde down - Before: {HordeX}, {HordeY}", horde.X, horde.Y);
                 horde.Y += horde.SpeedY;
-                _logger.LogInformation($"Moving horde down - After: {horde.X}, {horde.Y}");
+                // _logger.LogInformation("Moving horde down - After: {HordeX}, {HordeY}", horde.X, horde.Y);
             }
             foreach (var boss in _gameState.Bosses)
             {
-                _logger.LogInformation($"Moving boss down - Before: {boss.X}, {boss.Y}");
+               // _logger.LogInformation("Moving boss down - Before: {BossX}, {BossY}", boss.X, boss.Y);
                 boss.Y += boss.SpeedY;
-                _logger.LogInformation($"Moving boss down - After: {boss.X}, {boss.Y}");
+               // _logger.LogInformation("Moving boss down - After: {BossX}, {BossY}", boss.X, boss.Y);
             }
             _gameState.Chest.Y += _gameState.Chest.SpeedY;
-        } // <--- Lock ends here
+        } 
     }
 
     private void GenerateEnemies()
     {
-        lock (_gameStateLock) // <--- Add lock here
+        lock (_gameStateLock) 
         {
-            _logger.LogInformation("Generating enemies");
+            // _logger.LogInformation("Generating enemies");
             if (_random.Next(100) < 5)
             {
                 int minSpawnX = 25; // Minimum X for horde spawn (25 from left edge)
@@ -168,13 +166,13 @@ public class Game
 
                 var newHorde = new Horde() { X = hordeX, Y = 0, SpeedY = 1 };
                 _gameState.Hordes.Add(newHorde);
-                _logger.LogInformation($"Horde generated at X: {newHorde.X}, Y: {newHorde.Y}");
+               // _logger.LogInformation("Horde generated at X: {NewHordeX}, Y: {NewHordeY}", newHorde.X, newHorde.Y);
             }
             if (_random.Next(1000) < 1)
             {
                 int minBossSpawnX = 25; // Minimum X for boss spawn (25 from left edge)
                 int maxBossSpawnX = _gameState.ScreenWidth - 25; // Maximum X for boss spawn (25 from right edge)
-                 int bossSpawnableWidth = maxBossSpawnX - minBossSpawnX;
+                int bossSpawnableWidth = maxBossSpawnX - minBossSpawnX;
                 int bossX;
                 if (bossSpawnableWidth > 0)
                 {
@@ -186,7 +184,7 @@ public class Game
                 }
                 var newBoss = new Boss() { X = bossX, Y = 0, SpeedY = 0.5 };
                 _gameState.Bosses.Add(newBoss);
-                _logger.LogInformation($"Boss generated at X: {newBoss.X}, Y: {newBoss.Y}");
+                // _logger.LogInformation("Boss generated at X: {NewBossX}, Y: {NewBossY}", newBoss.X, newBoss.Y);
             }
         }
     }
@@ -195,7 +193,7 @@ public class Game
     {
         lock (_gameStateLock)
         { 
-            _logger.LogInformation("Handling soldier attacks");
+            // _logger.LogInformation("Handling soldier attacks");
             List<Horde> nextHordes = new List<Horde>(); // Create a *new* list for hordes to keep
             
             _gameState.Shots.Clear();
@@ -203,11 +201,11 @@ public class Game
             foreach (var horde in _gameState.Hordes)
             {
                 // --- Attack condition (range check for X) ---
-                if (Math.Abs(horde.X - _gameState.Soldier.X) <= 25 && horde.Y < _gameState.Soldier.Y && horde.Y > 0)
+                if (_gameState.Soldier != null && Math.Abs(horde.X - _gameState.Soldier.X) <= 25 && horde.Y < _gameState.Soldier.Y && horde.Y > 0)
                 {
-                    _logger.LogInformation($"Horde IN ATTACK ZONE! Horde X:{horde.X}, Y:{horde.Y}, SoldierX:{_gameState.Soldier.X}, SoldierY:{_gameState.Soldier.Y}");
+                    // _logger.LogInformation("Horde IN ATTACK ZONE! Horde X:{HordeX}, Y:{HordeY}, SoldierX:{SoldierX}, SoldierY:{SoldierY}", horde.X, horde.Y, _gameState.Soldier.X, _gameState.Soldier.Y);
                     horde.HitPoints--;
-                    _logger.LogInformation($"Horde hit, HP: {horde.HitPoints}, HordeID: {horde.Id}");
+                    // _logger.LogInformation("Horde hit, HP: {HordeHitPoints}, HordeID: {HordeId}", horde.HitPoints, horde.Id);
                     
                     // --- Create a Moving Shot object ---
                     _gameState.Shots.Add(new Shot { X = _gameState.Soldier.X, Y = _gameState.Soldier.Y - 20 }); // Start Y above soldier
@@ -220,23 +218,23 @@ public class Game
                     else
                     {
                         _gameState.HordeKills++;
-                        _logger.LogInformation($"Horde killed, Kills: {_gameState.HordeKills}, HordeID: {horde.Id}");
+                        // _logger.LogInformation("Horde killed, Kills: {GameStateHordeKills}, HordeID: {HordeId}", _gameState.HordeKills, horde.Id);
                     }
                 }
                 else
                 {
                     nextHordes.Add(horde); // Add horde to the *new* list if it's not hit (or not in attack zone)
-                    _logger.LogInformation($"Horde NOT in attack zone: X:{horde.X}, Y:{horde.Y}, SoldierX:{_gameState.Soldier.X}, SoldierY:{_gameState.Soldier.Y}");
+                    // _logger.LogInformation("Horde NOT in attack zone: X:{HordeX}, Y:{HordeY}, SoldierX:{SoldierX}, SoldierY:{SoldierY}", horde.X, horde.Y, _gameState.Soldier.X, _gameState.Soldier.Y);
                 }
         
             }
-            _gameState.Hordes = nextHordes; // Replace the *old* Hordes list with the *new* one
+            _gameState.Hordes = nextHordes; 
 
             // Boss attack logic (similar approach - create new Bosses list)
             List<Boss> nextBosses = new List<Boss>();
             foreach (var boss in _gameState.Bosses)
             {
-                if (Math.Abs(boss.X - _gameState.Soldier.X) <= 25 && boss.Y < _gameState.Soldier.Y && boss.Y > 0)
+                if (_gameState.Soldier != null && Math.Abs(boss.X - _gameState.Soldier.X) <= 25 && boss.Y < _gameState.Soldier.Y && boss.Y > 0)
                 {
                     boss.HitPoints--;
                     _gameState.Shots.Add(new Shot { X = _gameState.Soldier.X, Y = _gameState.Soldier.Y - 20 }); // Start Y above soldier
@@ -255,7 +253,7 @@ public class Game
                     nextBosses.Add(boss);
                 }
             }
-            _gameState.Bosses = nextBosses; // Replace Bosses list too
+            _gameState.Bosses = nextBosses; 
         }
     }
 
@@ -263,11 +261,11 @@ public class Game
     {
         lock(_gameStateLock)
         {
-            _logger.LogInformation("Handling chest interaction");
+            // _logger.LogInformation("Handling chest interaction");
 
             // --- "Touch" based interaction ---
             // Check for overlap (adjust the proximity range - e.g., 30 pixels)
-            if (Math.Abs(_gameState.Chest.X - _gameState.Soldier.X) < 30 && Math.Abs(_gameState.Chest.Y - _gameState.Soldier.Y) < 30 && !_gameState.Chest.IsDestroyed)
+            if (_gameState.Soldier != null && Math.Abs(_gameState.Chest.X - _gameState.Soldier.X) < 30 && Math.Abs(_gameState.Chest.Y - _gameState.Soldier.Y) < 30 && !_gameState.Chest.IsDestroyed)
             {
                 _gameState.Chest.IsDestroyed = true; // Destroy immediately on touch
                 AwardBonus();
@@ -282,31 +280,31 @@ public class Game
         }
     }
 
-    private void RespawnChest() // Separate method for respawning chest to keep code clean
+    private void RespawnChest() 
     {
-        _gameState.Chest = new Chest() { X = _random.Next(0, _gameState.ScreenWidth - 25), Y = 50, IsDestroyed = false, Bonus = BonusType.None };
-        _logger.LogInformation("Chest respawned");
+        // 10% chance to respawn a chest
+        if (_random.Next(100) < 10)
+        {
+            _gameState.Chest = new Chest() { X = _random.Next(0, _gameState.ScreenWidth - 25), Y = 50, IsDestroyed = false, Bonus = BonusType.None };
+            _logger.LogInformation("Chest respawned");
+        }
+        else
+        {
+         //   _logger.LogInformation("Chest did not respawn this time");
+        }
     }
 
     private void AwardBonus()
     {
         BonusType bonus = (BonusType)_random.Next(1, Enum.GetValues(typeof(BonusType)).Length);
         _gameState.Chest.Bonus = bonus;
-        _gameState.ActiveBonus = bonus; // Set active bonus
-        _gameState.BonusEndTime = DateTime.UtcNow.AddSeconds(10); // Set bonus duration to 10 seconds
         switch (bonus)
         {
-            case BonusType.MoreSoldiers:
-                _gameState.Message = "Bonus: More Soldiers!";
-                // --- Add extra soldiers to BonusSoldiers list ---
-                if (_gameState.Soldier != null) // Ensure main soldier exists
-                {
-                    _gameState.BonusSoldiers.Add(new Soldier() { X = _gameState.Soldier.X - 50, Y = _gameState.Soldier.Y }); // Bonus soldier to the left
-                    _gameState.BonusSoldiers.Add(new Soldier() { X = _gameState.Soldier.X + 50, Y = _gameState.Soldier.Y }); // Bonus soldier to the right
-                }
+            case BonusType.PowerSoldier:
+                _gameState.Message = "Bonus: Power Soldier! (Soldier will shot 5 bullets at once)";
                 break;
             case BonusType.PowerfulWeapon:
-                _gameState.Message = "Bonus: Powerful Weapon!";
+                _gameState.Message = "Bonus: Powerful Weapon! (Weapon damage increased by 5)";
                 break;
             default:
                 _gameState.Message = "Bonus received!";
@@ -320,41 +318,47 @@ public class Game
     {
         lock(_gameStateLock)
         {
-            _logger.LogInformation("Checking game over");
+            // _logger.LogInformation("Checking game over");
             foreach (var horde in _gameState.Hordes)
             {
-                _logger.LogInformation($"Checking Horde Game Over Y:{horde.Y}, Soldier Y:{_gameState.Soldier.Y}");
-                // --- REVISED GAME OVER CONDITION - USE >= ---
-                if (horde.Y >= _gameState.Soldier.Y) // Changed > to >=
+                if (_gameState.Soldier != null)
                 {
-                    _gameState.IsGameOver = true;
-                    _gameState.Message = "Game Over! Hordes reached the soldier.";
-                    _logger.LogWarning("Game Over triggered by Horde!");
-                    StopGameLoop();
-                    return; // Exit after game over
+                    // _logger.LogInformation("Checking Horde Game Over Y:{HordeY}, Soldier Y:{SoldierY}", horde.Y, _gameState.Soldier.Y);
+
+                    if (horde.Y >= _gameState.Soldier.Y)
+                    {
+                        _gameState.IsGameOver = true;
+                        _gameState.Message = "Game Over! Hordes reached the soldier.";
+                        _logger.LogWarning("Game Over triggered by Horde!");
+                        StopGameLoop();
+                        return; // Exit after game over
+                    }
                 }
             }
             foreach (var boss in _gameState.Bosses)
             {
-                _logger.LogInformation($"Checking Boss Game Over Y:{boss.Y}, Soldier Y:{_gameState.Soldier.Y}");
-                if (boss.Y >= _gameState.Soldier.Y) // Changed > to >= for bosses too
+                if (_gameState.Soldier != null)
                 {
-                    _gameState.IsGameOver = true;
-                    _gameState.Message = "Game Over! Boss reached the soldier.";
-                    _logger.LogWarning("Game Over triggered by Boss!");
-                    StopGameLoop();
-                    return; // Exit after game over
+                    // _logger.LogInformation("Checking Boss Game Over Y:{BossY}, Soldier Y:{SoldierY}", boss.Y, _gameState.Soldier.Y);
+                    if (boss.Y >= _gameState.Soldier.Y)
+                    {
+                        _gameState.IsGameOver = true;
+                        _gameState.Message = "Game Over! Boss reached the soldier.";
+                        _logger.LogWarning("Game Over triggered by Boss!");
+                        StopGameLoop();
+                        return; // Exit after game over
+                    }
                 }
             }
         }
         
     }
     
-    private void MoveShotsUpward() // <-- ADD THIS NEW METHOD
+    private void MoveShotsUpward() 
     {
         lock (_gameStateLock)
         {
-            _logger.LogInformation("Moving shots upward");
+            // _logger.LogInformation("Moving shots upward");
             List<Shot> nextShots = new List<Shot>(); // Create a new list for shots that are still on screen
             foreach (var shot in _gameState.Shots)
             {
@@ -363,15 +367,14 @@ public class Game
                 if (shot.Y >= -150 ) // Keep shots that are still visible (adjust -20 based on shot image size and desired off-screen removal point)
                 {
                     nextShots.Add(shot); // Add shot to the new list if it's still on screen
-                    _logger.LogInformation($"Moving shot - Shot X:{shot.X}, Y:{shot.Y}");
+                   // _logger.LogInformation("Moving shot - Shot X:{ShotX}, Y:{ShotY}", shot.X, shot.Y);
                 }
                 else
                 {
-                    _logger.LogInformation($"Removing off-screen shot - Shot X:{shot.X}, Y:{shot.Y}");
-                    // Shot is off-screen, don't add it to nextShots (effectively removing it)
+                    _logger.LogInformation("Removing off-screen shot - Shot X:{ShotX}, Y:{ShotY}", shot.X, shot.Y);
                 }
             }
-            _gameState.Shots = nextShots; // Replace the old shots list with the new one containing only on-screen shots
+            _gameState.Shots = nextShots; 
         }
     }
 }
