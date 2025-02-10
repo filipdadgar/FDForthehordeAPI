@@ -10,6 +10,7 @@ const apiurl = 'https://hordeapi-csexhfc9ekdda2ej.swedencentral-01.azurewebsites
 
 let gameState = null;
 let gameLoopRunning = false;
+let moveInterval = null;
 
 // Get references to touch buttons
 const leftButton = document.getElementById('left-button');
@@ -18,21 +19,45 @@ const rightButton = document.getElementById('right-button');
 // --- Touch and Mouse event listeners for left button ---
 leftButton.addEventListener('touchstart', (event) => {
     event.preventDefault(); // Prevent default touch behavior
-    moveSoldier('left');
+    startMoving('left');
+});
+leftButton.addEventListener('touchend', (event) => {
+    event.preventDefault();
+    stopMoving();
 });
 leftButton.addEventListener('mousedown', (event) => { // For desktop mouse clicks
     event.preventDefault();
-    moveSoldier('left');
+    startMoving('left');
+});
+leftButton.addEventListener('mouseup', (event) => {
+    event.preventDefault();
+    stopMoving();
+});
+leftButton.addEventListener('mouseleave', (event) => {
+    event.preventDefault();
+    stopMoving();
 });
 
 // --- Touch and Mouse event listeners for right button ---
 rightButton.addEventListener('touchstart', (event) => {
     event.preventDefault(); // Prevent default touch behavior
-    moveSoldier('right');
+    startMoving('right');
+});
+rightButton.addEventListener('touchend', (event) => {
+    event.preventDefault();
+    stopMoving();
 });
 rightButton.addEventListener('mousedown', (event) => { // For desktop mouse clicks
     event.preventDefault();
-    moveSoldier('right');
+    startMoving('right');
+});
+rightButton.addEventListener('mouseup', (event) => {
+    event.preventDefault();
+    stopMoving();
+});
+rightButton.addEventListener('mouseleave', (event) => {
+    event.preventDefault();
+    stopMoving();
 });
 
 startGameButton.addEventListener('click', startGame);
@@ -89,6 +114,16 @@ async function moveSoldier(direction) {
     } else {
         console.error("Failed to move soldier:", response.statusText);
     }
+}
+
+function startMoving(direction) {
+    if (moveInterval) return; // Prevent multiple intervals
+    moveInterval = setInterval(() => moveSoldier(direction), 100); // Move every 100ms
+}
+
+function stopMoving() {
+    clearInterval(moveInterval);
+    moveInterval = null;
 }
 
 function drawGame() {
