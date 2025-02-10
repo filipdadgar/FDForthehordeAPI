@@ -1,6 +1,28 @@
-﻿services:
+﻿version: '3.8'
+
+services:
   fdforthehordeapi:
     image: fdforthehordeapi
     build:
       context: .
       dockerfile: FDForthehordeAPI/Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - fdforthehorde-network
+  
+  fdforthehordeweb:
+    image: fdforthehordeweb
+    build:
+      context: .
+      dockerfile: FDForthehordeWeb/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - fdforthehordeapi
+    networks:
+      - fdforthehorde-network
+
+networks:
+  fdforthehorde-network:
+    driver: bridge
