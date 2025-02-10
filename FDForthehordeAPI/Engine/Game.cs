@@ -283,8 +283,8 @@ public class Game
 
     private void RespawnChest() 
     {
-        // 10% chance to respawn a chest
-        if (_random.Next(100) < 10)
+        // 20% chance to respawn a chest
+        if (_random.Next(100) < 20)
         {
             _gameState.Chest = new Chest() { X = _random.Next(0, _gameState.ScreenWidth - 25), Y = 50, IsDestroyed = false, Bonus = BonusType.None };
             _logger.LogInformation("Chest respawned");
