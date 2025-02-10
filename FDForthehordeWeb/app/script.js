@@ -69,10 +69,10 @@ async function startGame() {
         stopGame(); // Call stopGame function
         startGameButton.textContent = "Start Game"; // Change button text to "Start Game"
     } else { // Game is not running, so start it
-        console.log("Starting new game");
+        //console.log("Starting new game");
         const response = await fetch(`${apiurl}/Game/start`, { method: 'POST' });
         gameState = await response.json();
-        console.log("Game state after starting:", gameState);
+        //console.log("Game state after starting:", gameState);
         setCanvasSize(gameState.screenWidth, gameState.screenHeight);
         gameLoopRunning = true;
         gameLoop();
@@ -81,7 +81,7 @@ async function startGame() {
 }
 
 function stopGame() {
-    console.log("Stopping game");
+    // console.log("Stopping game");
     gameLoopRunning = false; // Stop the animation loop
     // Optional: Send a request to backend to explicitly stop backend loop if needed
     fetch(`${apiurl}/Game/stop`, { method: 'POST' });
@@ -103,7 +103,7 @@ async function moveSoldier(direction) {
         return;
     }
 
-    console.log(`Moving soldier ${direction}`);
+    // console.log(`Moving soldier ${direction}`);
     const response = await fetch(`${apiurl}/Game/soldier/move`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -112,9 +112,9 @@ async function moveSoldier(direction) {
 
     if (response.ok) {
         gameState = await response.json();
-        console.log("Game state after moving soldier:", gameState);
+       // console.log("Game state after moving soldier:", gameState);
     } else {
-        console.error("Failed to move soldier:", response.statusText);
+       // console.error("Failed to move soldier:", response.statusText);
     }
 }
 
