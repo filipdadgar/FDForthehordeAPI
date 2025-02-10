@@ -4,6 +4,7 @@ const hordeKillsElement = document.getElementById('horde-kills');
 const bossKillsElement = document.getElementById('boss-kills');
 const gameTimeElement = document.getElementById('game-time');
 const startGameButton = document.getElementById('start-game-button');
+const messageElement = document.getElementById('game-message');
 
 let gameState = null;
 let gameLoopRunning = false;
@@ -31,7 +32,6 @@ function stopGame() {
     gameLoopRunning = false; // Stop the animation loop
     // Optional: Send a request to backend to explicitly stop backend loop if needed
     fetch('http://localhost:5105/Game/stop', { method: 'POST' });
-    // No need to reset gameState to null here in frontend, backend will handle on next start
 }
 
 
@@ -137,6 +137,11 @@ function drawGame() {
     hordeKillsElement.textContent = gameState.hordeKills;
     bossKillsElement.textContent = gameState.bossKills;
     gameTimeElement.textContent = gameState.gameTime ? Math.floor(parseFloat(gameState.gameTime.split(':')[2])) : 0;
+    if (gameState.message) {
+        messageElement.textContent = gameState.message; // Display message if available
+    } else {
+        messageElement.textContent = ''; // Clear message if no message from backend
+    }
 }
 
 async function gameLoop() {
