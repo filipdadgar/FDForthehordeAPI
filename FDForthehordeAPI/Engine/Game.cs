@@ -332,7 +332,9 @@ public class Game
                 {
                     if (_gameState.Soldier != null)
                         _gameState.Shots.Add(new Shot
-                            { X = _gameState.Soldier.X + (i * 10), Y = _gameState.Soldier.Y - 20 });
+                            { X = _gameState.Soldier.X + (i * 10), 
+                              Y = _gameState.Soldier.Y - 20,
+                              SpeedY = -30 });
                 } 
                 break;
             case BonusType.PowerfulWeapon:
