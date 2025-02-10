@@ -114,6 +114,7 @@ public class Game
             HandleSoldierAttacks();
             HandleChestInteraction();
             CheckGameOver();
+            ApplyActiveBonuses();
 
             _logger.LogInformation("Updating game state - End - Hordes count: {HordesCount}, Bosses count: {BossesCount}", _gameState.Hordes.Count, _gameState.Bosses.Count);
 
@@ -298,19 +299,49 @@ public class Game
     {
         BonusType bonus = (BonusType)_random.Next(1, Enum.GetValues(typeof(BonusType)).Length);
         _gameState.Chest.Bonus = bonus;
+        _gameState.ActiveBonus = bonus;
+        _gameState.BonusEndTime = DateTime.Now.AddSeconds(10); // Bonus lasts for 10 seconds
+        
         switch (bonus)
         {
             case BonusType.PowerSoldier:
                 _gameState.Message = "Bonus: Power Soldier! (Soldier will shot 5 bullets at once)";
                 break;
             case BonusType.PowerfulWeapon:
-                _gameState.Message = "Bonus: Powerful Weapon! (Weapon damage increased by 5)";
+                _gameState.Message = "Bonus: Powerful Weapon! (Weapon speed increased)";
                 break;
             default:
                 _gameState.Message = "Bonus received!";
                 break;
         }
         Task.Delay(3000).ContinueWith(_ => _gameState.Message = "");
+    }
+    
+    private void ApplyActiveBonuses()
+    {
+        if (_gameState.ActiveBonus != BonusType.None && DateTime.Now > _gameState.BonusEndTime)
+        {
+            _gameState.ActiveBonus = BonusType.None; // Reset bonus after expiration
+            _logger.LogInformation("Bonus expired");
+        }
+
+        switch (_gameState.ActiveBonus)
+        {
+            case BonusType.PowerSoldier:
+                for (int i = -2; i <= 2; i++)
+                {
+                    if (_gameState.Soldier != null)
+                        _gameState.Shots.Add(new Shot
+                            { X = _gameState.Soldier.X + (i * 10), Y = _gameState.Soldier.Y - 20 });
+                } 
+                break;
+            case BonusType.PowerfulWeapon:
+                foreach (var shot in _gameState.Shots)
+                {
+                    shot.SpeedY = 10;
+                }
+                break;
+        }
     }
     
 
