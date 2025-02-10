@@ -7,6 +7,8 @@ const startGameButton = document.getElementById('start-game-button');
 const messageElement = document.getElementById('game-message');
 
 const apiurl = 'https://hordeapi-csexhfc9ekdda2ej.swedencentral-01.azurewebsites.net';
+//const apiurl = 'http://localhost:5105';
+
 
 let gameState = null;
 let gameLoopRunning = false;
@@ -189,9 +191,9 @@ function drawGame() {
     if (gameState.shots && gameState.shots.length > 0) {
         gameState.shots.forEach(shot => {
             const shotImg = new Image();
-            shotImg.src = 'shot.png';
+            shotImg.src = 'big.png';
             shotImg.onload = () => {
-                ctx.drawImage(shotImg, shot.x, shot.y, 20, 20);
+                ctx.drawImage(shotImg, shot.x, shot.y, 50, 50);
             };
         });
     }
@@ -207,10 +209,49 @@ function drawGame() {
     }
 }
 
+function moveShotsUpward() {
+    if (!gameState) return;
+
+    const nextShots = [];
+    gameState.shots.forEach(shot => {
+        shot.y += shot.speedY; // Move shot up
+
+        // Check for collision with hordes
+        gameState.hordes.forEach(horde => {
+            if (shot.x >= horde.x && shot.x <= horde.x + 30 && shot.y >= horde.y && shot.y <= horde.y + 30) {
+                horde.hitPoints--;
+                if (horde.hitPoints <= 0) {
+                    gameState.hordeKills++;
+                    gameState.hordes = gameState.hordes.filter(h => h !== horde);
+                }
+            }
+        });
+
+        // Check for collision with bosses
+        gameState.bosses.forEach(boss => {
+            if (shot.x >= boss.x && shot.x <= boss.x + 50 && shot.y >= boss.y && shot.y <= boss.y + 50) {
+                boss.hitPoints--;
+                if (boss.hitPoints <= 0) {
+                    gameState.bossKills++;
+                    gameState.bosses = gameState.bosses.filter(b => b !== boss);
+                }
+            }
+        });
+
+        // Keep shot if it is still on screen and did not hit any target
+        if (shot.y > 0) {
+            nextShots.push(shot);
+        }
+    });
+
+    gameState.shots = nextShots;
+}
+
 async function gameLoop() {
     if (!gameLoopRunning) return; // Stop the loop if gameLoopRunning is false
 
     await getGameState();
+    moveShotsUpward(); // Move shots upward in each frame
     drawGame();
     requestAnimationFrame(gameLoop);
 }
