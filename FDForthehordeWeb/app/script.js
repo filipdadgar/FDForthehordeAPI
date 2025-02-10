@@ -6,7 +6,7 @@ const gameTimeElement = document.getElementById('game-time');
 const startGameButton = document.getElementById('start-game-button');
 const messageElement = document.getElementById('game-message');
 
-const apiurl = 'http://localhost:8080';
+const apiurl = 'https://hordeapi-csexhfc9ekdda2ej.swedencentral-01.azurewebsites.net:8080';
 
 let gameState = null;
 let gameLoopRunning = false;
