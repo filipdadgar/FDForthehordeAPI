@@ -35,14 +35,15 @@ body {
 
 #controls {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     margin-top: 10px; /* Space above controls */
     width: 100%; /* Controls take full width of container */
-    max-width: 400px; /* Limit controls width */
+    max-width: 300px; /* Match canvas width */
 }
 
 .touch-button {
-    padding: 12px 24px; /* Fixed padding for desktop and base for mobile */
+    flex: 1; /* Make buttons take equal space */
+    padding: 12px 0; /* Fixed padding for desktop and base for mobile */
     margin: 0 5px;      /* Fixed margin for desktop and base for mobile */
     font-size: 16px;    /* Fixed font size for desktop and base for mobile */
     border: none;
@@ -67,7 +68,7 @@ body {
 /* --- Media Query for Mobile Devices (adjust breakpoint as needed) --- */
 @media (max-width: 600px) { /* Example breakpoint for smaller screens */
     .touch-button {
-        padding: 4vw 8vw; /* Viewport-width based padding for mobile */
+        padding: 4vw 0; /* Viewport-width based padding for mobile */
         margin: 0 2vw;    /* Viewport-width based margin for mobile */
         font-size: 4vw;   /* Viewport-width based font size for mobile */
         min-width: 0;      /* Allow buttons to shrink on very small screens */
@@ -82,7 +83,6 @@ body {
         margin-top: 5px; /* Less margin on mobile */
     }
 }
-
 
 .soldier {
     background-image: url('soldier.png');
