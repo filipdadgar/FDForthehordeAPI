@@ -5,15 +5,23 @@ const bossKillsElement = document.getElementById('boss-kills');
 const gameTimeElement = document.getElementById('game-time');
 const startGameButton = document.getElementById('start-game-button');
 const messageElement = document.getElementById('game-message');
+const controlsDiv = document.getElementById('controls');
+controlsDiv.style.display = isMobileDevice() ? 'flex' : 'none';
 
 const apiurl = 'https://hordeapi-csexhfc9ekdda2ej.swedencentral-01.azurewebsites.net';
 
 let gameState = null;
 let gameLoopRunning = false;
+let touchStartX = null;
+let touchThreshold = 30;
 
 // Get references to touch buttons
 const leftButton = document.getElementById('left-button');
 const rightButton = document.getElementById('right-button');
+
+canvas.addEventListener('touchstart', handleTouchStart);
+canvas.addEventListener('touchmove', handleTouchMove);
+canvas.addEventListener('touchend', handleTouchEnd);
 
 // --- Touch and Mouse event listeners for left button ---
 leftButton.addEventListener('touchstart', (event) => {
@@ -189,6 +197,33 @@ document.addEventListener('keydown', (event) => {
 function setCanvasSize(screenWidth, screenHeight) {
     canvas.width = screenWidth;
     canvas.height = screenHeight;
+}
+
+function handleTouchStart(event) {
+    event.preventDefault();
+    const touch = event.touches[0];
+    touchStartX = touch.clientX;
+}
+
+function handleTouchMove(event) {
+    if (!touchStartX || !gameLoopRunning) return;
+
+    event.preventDefault();
+    const touch = event.touches[0];
+    const diffX = touch.clientX - touchStartX;
+
+    if (Math.abs(diffX) >= touchThreshold) {
+        moveSoldier(diffX > 0 ? 'right' : 'left');
+        touchStartX = touch.clientX; // Reset to allow continuous movement
+    }
+}
+
+function handleTouchEnd() {
+    touchStartX = null;
+}
+
+function isMobileDevice() {
+    return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
 }
 
 // Initial canvas size setup (optional - can be set in HTML)
