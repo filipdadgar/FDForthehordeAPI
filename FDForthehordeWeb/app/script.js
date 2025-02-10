@@ -162,13 +162,16 @@ function drawGame() {
         });
     }
 
-    // Draw bosses
+    // Draw bosses with hitpoints
     if (gameState.bosses && gameState.bosses.length > 0) {
         gameState.bosses.forEach(boss => {
             const bossImg = new Image();
             bossImg.src = 'boss.png';
             bossImg.onload = () => {
                 ctx.drawImage(bossImg, boss.x, boss.y, 50, 50);
+                ctx.fillStyle = 'red';
+                ctx.font = '16px Arial';
+                ctx.fillText(boss.hitPoints, boss.x + 15, boss.y - 10); // Adjust position as needed
             };
         });
     }
