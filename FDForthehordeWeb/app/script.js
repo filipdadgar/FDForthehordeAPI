@@ -60,7 +60,6 @@ function stopGame() {
     fetch(`${apiurl}/Game/stop`, { method: 'POST' });
 }
 
-
 async function getGameState() {
     if (!gameLoopRunning) return; // Stop fetching state if game loop is not running
     const response = await fetch(`${apiurl}/Game/state`);
