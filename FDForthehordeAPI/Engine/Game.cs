@@ -13,6 +13,7 @@ public class Game
     private static ILogger _logger; // Logger instance
     private static readonly object _gameStateLock = new object(); // Lock object for gameState
     private static DateTime _chestRespawnCooldownEndTime = DateTime.MinValue; // Initialize to past date
+    private readonly HighscoreManager _highscoreManager = new HighscoreManager();
 
 
     // Constructor to inject ILoggerFactory
@@ -293,8 +294,8 @@ public class Game
         int maxSpawnX = _gameState.ScreenWidth - 25; // Maximum X (25 from right edge)
         int spawnableWidth = maxSpawnX - minSpawnX;
         
-        // 20% chance to respawn a chest
-        if (_random.Next(100) < 20)
+        // 10% chance to respawn a chest
+        if (_random.Next(100) < 10)
         {
             _gameState.Chest = new Chest() { X = _random.Next(0, spawnableWidth), IsDestroyed = false, Bonus = BonusType.None };
             // _logger.LogInformation("RespawnChest(): Chest respawned SUCCESSFULLY! X:{maxSpawnX}, Y:{minSpawnX}", maxSpawnX, minSpawnX); // Log spawn coordinates
@@ -390,6 +391,7 @@ public class Game
                     }
                 }
             }
+            SaveHighScore();
         }
         
     }
@@ -415,6 +417,22 @@ public class Game
                 }
             }
             _gameState.Shots = nextShots; 
+        }
+    }
+    
+    public bool SaveHighScore()
+    {
+        lock (_gameStateLock)
+        {
+            if (_gameState.HordeKills > 0)
+            {
+                int totalKills = _gameState.HordeKills + _gameState.BossKills * 5;
+                if (_highscoreManager.IsTop10Score(totalKills))
+                {
+                    return true; // Indicate that the score is in the top 10
+                }
+            }
+            return false; // Indicate that the score is not in the top 10
         }
     }
 }

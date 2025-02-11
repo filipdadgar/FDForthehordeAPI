@@ -10,6 +10,7 @@ public class GameController : ControllerBase
 {
     private readonly Game _gameEngine; // Inject Game engine
     private readonly ILogger<GameController> _logger; // Logger for controller
+    private readonly HighscoreManager _highscoreManager = new HighscoreManager(); // Inject HighscoreManager
 
     // Constructor to inject Game engine and ILogger
     public GameController(Game gameEngine, ILogger<GameController> logger)
@@ -31,7 +32,10 @@ public class GameController : ControllerBase
     public ActionResult<GameState> GetGameState()
     {
         // _logger.LogInformation("GetGameState endpoint called");
-        return Ok(_gameEngine.GetGameState());
+        // return Ok(_gameEngine.GetGameState());
+        var gameState = _gameEngine.GetGameState();
+        bool isTop10 = _gameEngine.SaveHighScore();
+        return Ok(new { gameState, isTop10 });
     }
 
     [HttpPost("soldier/move")]
@@ -75,4 +79,28 @@ public class GameController : ControllerBase
         _gameEngine.StopGameLoop();
         return Ok(new { message = "Game stopped" });
     }
+    
+    [HttpPost("highscore")]
+    public IActionResult SaveHighscore([FromBody] Highscore highscore)
+    {
+        if (highscore == null || string.IsNullOrEmpty(highscore.PlayerName))
+        {
+            return BadRequest("Invalid highscore data.");
+        }
+
+        _highscoreManager.AddHighscore(highscore);
+        _highscoreManager.SortHighscores();
+        _highscoreManager.SaveHighscores();
+        _logger.LogInformation("Highscore saved successfully.");
+
+        return Ok(new { message = "Highscore saved successfully." });
+    }
+    
+    [HttpGet("highscores")]
+    public ActionResult<List<Highscore>> GetHighscores()
+    {
+        return Ok(_highscoreManager.GetHighscores());
+    }
+    
+    
 }

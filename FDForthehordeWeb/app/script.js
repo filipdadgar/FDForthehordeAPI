@@ -17,8 +17,8 @@ const chestImg = new Image();
 chestImg.src = 'chest.png';
 
 
-const apiurl = 'https://hordeapi-csexhfc9ekdda2ej.swedencentral-01.azurewebsites.net';
-// const apiurl = 'http://localhost:5105';
+//const apiurl = 'https://hordeapi-csexhfc9ekdda2ej.swedencentral-01.azurewebsites.net';
+ const apiurl = 'http://localhost:5105';
 
 
 let gameState = null;
@@ -101,10 +101,18 @@ function stopGame() {
 async function getGameState() {
     if (!gameLoopRunning) return; // Stop fetching state if game loop is not running
     const response = await fetch(`${apiurl}/Game/state`);
-    gameState = await response.json();
+    const data = await response.json();
+    gameState = data.gameState;
     if (gameState && gameState.isGameOver) {
         stopGame(); // Stop the frontend loop if game over is detected in backend state
-        alert(gameState.message);
+        if (data.isTop10) {
+            const playerName = prompt("Congratulations! You made it to the top 10. Please enter your name:");
+            if (playerName) {
+                await saveHighscore(playerName);
+            }
+        } else {
+            alert(gameState.message);
+        }
     }
 }
 
@@ -242,6 +250,35 @@ async function gameLoop() {
     drawGame();
     requestAnimationFrame(gameLoop);
 }
+
+async function saveHighscore(playerName) {
+    const response = await fetch(`${apiurl}/Game/highscore`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerName: playerName, totalKills: gameState.hordeKills + gameState.bossKills * 5 })
+    });
+    if (response.ok) {
+        alert("Highscore saved successfully!");
+    } else {
+        alert("Failed to save highscore.");
+    }
+}
+
+async function fetchHighscores() {
+    const response = await fetch(`${apiurl}/Game/highscores`);
+    const highscores = await response.json();
+    const highscoreList = document.getElementById('highscore-list');
+    highscoreList.innerHTML = ''; // Clear existing list
+
+    highscores.forEach(highscore => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${highscore.createdAt} ${highscore.playerName}: ${highscore.totalKills} kills`  ;
+        highscoreList.appendChild(listItem);
+    });
+}
+
+// Call fetchHighscores when the page loads
+document.addEventListener('DOMContentLoaded', fetchHighscores);
 
 document.addEventListener('keydown', (event) => {
     if (event.key === 'ArrowLeft') {

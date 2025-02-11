@@ -118,3 +118,21 @@ body {
     width: 20px;
     height: 20px;
 }
+
+#highscore-container {
+    margin-top: 20px;
+    text-align: left;
+    width: fit-content;
+}
+
+#highscore-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+#highscore-list li {
+    background-color: #333;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+}
