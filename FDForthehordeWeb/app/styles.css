@@ -15,10 +15,10 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%; /* Take full width of body */
-    max-width: 600px; /* Limit container width on large screens if needed */
-    padding: 20px; /* Add some padding around the container */
-    box-sizing: border-box; /* Include padding in width/height */
+    width: 100%;
+    max-width: 600px;
+    padding: 20px; /* Keep some padding for larger screens */
+    box-sizing: border-box;
 }
 
 #game-canvas {
@@ -67,20 +67,25 @@ body {
 
 /* --- Media Query for Mobile Devices (adjust breakpoint as needed) --- */
 @media (max-width: 600px) { /* Example breakpoint for smaller screens */
+    #game-container {
+        padding-top: 10px; /* Reduced top padding on mobile */
+        padding-bottom: 10px; /* Reduced bottom padding on mobile */
+    }
+
     .touch-button {
-        padding: 4vw 0; /* Viewport-width based padding for mobile */
-        margin: 0 2vw;    /* Viewport-width based margin for mobile */
-        font-size: 4vw;   /* Viewport-width based font size for mobile */
-        min-width: 0;      /* Allow buttons to shrink on very small screens */
+        padding: 3vw 0; /* Further reduced vertical padding on mobile buttons */ /* Reduced to make buttons less tall */
+        margin: 0 2vw;
+        font-size: 4vw;
+        min-width: 0;
     }
 
     #game-info {
-        margin-bottom: 5px; /* Less margin on mobile */
-        font-size: 0.9em; /* Slightly smaller font for game info on mobile */
+        margin-bottom: 5px;
+        font-size: 0.9em;
     }
 
     #controls {
-        margin-top: 5px; /* Less margin on mobile */
+        margin-top: 5px;
     }
 }
 

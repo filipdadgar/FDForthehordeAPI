@@ -72,7 +72,7 @@ async function startGame() {
         console.log("Starting new game");
         const response = await fetch(`${apiurl}/Game/start`, { method: 'POST' });
         gameState = await response.json();
-        console.log("Game state after starting:", gameState);
+        // console.log("Game state after starting:", gameState);
         setCanvasSize(gameState.screenWidth, gameState.screenHeight);
         gameLoopRunning = true;
         gameLoop();
@@ -103,7 +103,7 @@ async function moveSoldier(direction) {
         return;
     }
 
-    console.log(`Moving soldier ${direction}`);
+    //console.log(`Moving soldier ${direction}`);
     const response = await fetch(`${apiurl}/Game/soldier/move`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -112,7 +112,7 @@ async function moveSoldier(direction) {
 
     if (response.ok) {
         gameState = await response.json();
-        console.log("Game state after moving soldier:", gameState);
+       // console.log("Game state after moving soldier:", gameState);
     } else {
         console.error("Failed to move soldier:", response.statusText);
     }
