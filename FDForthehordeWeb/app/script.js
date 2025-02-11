@@ -5,6 +5,17 @@ const bossKillsElement = document.getElementById('boss-kills');
 const gameTimeElement = document.getElementById('game-time');
 const startGameButton = document.getElementById('start-game-button');
 const messageElement = document.getElementById('game-message');
+const hordeImg = new Image();
+hordeImg.src = 'horde.png';
+const shotImg = new Image();
+shotImg.src = 'big.png';
+const soldierImg = new Image();
+soldierImg.src = 'soldier.png';
+const bossImg = new Image();
+bossImg.src = 'boss.png';
+const chestImg = new Image();
+chestImg.src = 'chest.png';
+
 
 const apiurl = 'https://hordeapi-csexhfc9ekdda2ej.swedencentral-01.azurewebsites.net';
 //const apiurl = 'http://localhost:5105';
@@ -135,66 +146,42 @@ function drawGame() {
 
     // Draw soldier
     if (gameState.soldier) {
-        const soldierImg = new Image();
-        soldierImg.src = 'soldier.png';
-        soldierImg.onload = () => {
-            ctx.drawImage(soldierImg, gameState.soldier.x, gameState.soldier.y, 50, 50);
-        };
-
+        ctx.drawImage(soldierImg, gameState.soldier.x, gameState.soldier.y, 50, 50);
     }
 
-    if (gameState.bonusSoldiers && gameState.bonusSoldiers.length > 0) { // Draw bonus soldiers
+    // Draw bonus soldiers
+    if (gameState.bonusSoldiers && gameState.bonusSoldiers.length > 0) {
         gameState.bonusSoldiers.forEach(bonusSoldier => {
-            const soldierImg = new Image(); // Can reuse soldier image
-            soldierImg.src = 'soldier.png';
-            soldierImg.onload = () => {
-                ctx.drawImage(soldierImg, bonusSoldier.x, bonusSoldier.y, 50, 50);
-            };
+            ctx.drawImage(soldierImg, bonusSoldier.x, bonusSoldier.y, 50, 50);
         });
     }
 
     // Draw hordes
     if (gameState.hordes && gameState.hordes.length > 0) {
         gameState.hordes.forEach(horde => {
-            const hordeImg = new Image();
-            hordeImg.src = 'horde.png';
-            hordeImg.onload = () => {
-                ctx.drawImage(hordeImg, horde.x, horde.y, 30, 30);
-            };
+            ctx.drawImage(hordeImg, horde.x, horde.y, 30, 30);
         });
     }
 
     // Draw bosses with hitpoints
     if (gameState.bosses && gameState.bosses.length > 0) {
         gameState.bosses.forEach(boss => {
-            const bossImg = new Image();
-            bossImg.src = 'boss.png';
-            bossImg.onload = () => {
-                ctx.drawImage(bossImg, boss.x, boss.y, 50, 50);
-                ctx.fillStyle = 'red';
-                ctx.font = '16px Arial';
-                ctx.fillText(boss.hitPoints, boss.x + 15, boss.y - 10); // Adjust position as needed
-            };
+            ctx.drawImage(bossImg, boss.x, boss.y, 50, 50);
+            ctx.fillStyle = 'red';
+            ctx.font = '16px Arial';
+            ctx.fillText(boss.hitPoints, boss.x + 15, boss.y - 10); // Adjust position as needed
         });
     }
 
     // Draw chest
     if (gameState.chest && !gameState.chest.isDestroyed) {
-        const chestImg = new Image();
-        chestImg.src = 'chest.png';
-        chestImg.onload = () => {
-            ctx.drawImage(chestImg, gameState.chest.x, gameState.chest.y, 40, 40);
-        };
+        ctx.drawImage(chestImg, gameState.chest.x, gameState.chest.y, 40, 40);
     }
 
-    // --- Draw Shots ---
+    // Draw shots
     if (gameState.shots && gameState.shots.length > 0) {
         gameState.shots.forEach(shot => {
-            const shotImg = new Image();
-            shotImg.src = 'big.png';
-            shotImg.onload = () => {
-                ctx.drawImage(shotImg, shot.x, shot.y, 50, 50);
-            };
+            ctx.drawImage(shotImg, shot.x, shot.y, 20, 20);
         });
     }
 
@@ -205,7 +192,7 @@ function drawGame() {
     if (gameState.message) {
         messageElement.textContent = gameState.message; // Display message if available
     } else {
-        messageElement.textContent = ''; // Clear message if no message from backend
+        messageElement.textContent = 'No Active Bonus'; // Clear message if no message from backend
     }
 }
 

@@ -65,7 +65,7 @@ public enum BonusType
 {
     None = 0,
     PowerSoldier = 1,
-    PowerfulWeapon = 2
+    PowerfullWeapon = 2
     
 }
     

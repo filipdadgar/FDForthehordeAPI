@@ -305,10 +305,10 @@ public class Game
         switch (bonus)
         {
             case BonusType.PowerSoldier:
-                _gameState.Message = "Bonus: Power Soldier! (Soldier will shot 5 bullets at once)";
+                _gameState.Message = "Bonus: Power Soldier!";
                 break;
-            case BonusType.PowerfulWeapon:
-                _gameState.Message = "Bonus: Powerful Weapon! (Weapon speed increased)";
+            case BonusType.PowerfullWeapon:
+                _gameState.Message = "Bonus: Powerful Weapon!";
                 break;
             default:
                 _gameState.Message = "Bonus received!";
@@ -335,7 +335,7 @@ public class Game
                             { X = _gameState.Soldier.X + (i * 10), Y = _gameState.Soldier.Y - 20 });
                 } 
                 break;
-            case BonusType.PowerfulWeapon:
+            case BonusType.PowerfullWeapon:
                 foreach (var shot in _gameState.Shots)
                 {
                     shot.SpeedY = 10;
