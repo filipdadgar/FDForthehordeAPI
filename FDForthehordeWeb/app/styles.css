@@ -23,7 +23,7 @@ body {
 
 #game-canvas {
     border: 1px solid #fff;
-    display: block; /* Prevent extra bottom margin */
+    display: flex; /* Prevent extra bottom margin */
 }
 
 #game-info {

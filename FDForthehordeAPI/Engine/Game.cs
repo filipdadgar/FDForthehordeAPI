@@ -40,7 +40,7 @@ public class Game
             _logger.LogInformation("Initializing game data");
             _gameState = new GameState()
             {
-                Soldier = new Soldier() { X = 150, Y = 400 },
+                Soldier = new Soldier() { X = 150, Y = 450 },
                 Chest = new Chest() { X = _random.Next(0, 300), Y = 50 },
                 Hordes = new List<Horde>(), 
                 Bosses = new List<Boss>(),  
