@@ -13,7 +13,7 @@ public class GameState
     public bool IsGameOver { get; set; }
     public string Message { get; set; }
     public int ScreenWidth { get; set; } = 300; 
-    public int ScreenHeight { get; set; } = 400;
+    public int ScreenHeight { get; set; } = 550;
     public List<Shot> Shots { get; set; } = new List<Shot>();
     
     public BonusType ActiveBonus { get; set; }

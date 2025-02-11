@@ -116,7 +116,7 @@ public class Game
             CheckGameOver();
             ApplyActiveBonuses();
 
-            _logger.LogInformation("Updating game state - End - Hordes count: {HordesCount}, Bosses count: {BossesCount}", _gameState.Hordes.Count, _gameState.Bosses.Count);
+            // _logger.LogInformation("Updating game state - End - Hordes count: {HordesCount}, Bosses count: {BossesCount}", _gameState.Hordes.Count, _gameState.Bosses.Count);
 
             _gameState.GameTime += TimeSpan.FromMilliseconds(_gameTimer.Interval);
         }
@@ -266,7 +266,7 @@ public class Game
 
             // --- "Touch" based interaction ---
             // Check for overlap (adjust the proximity range - e.g., 30 pixels)
-            if (_gameState.Soldier != null && Math.Abs(_gameState.Chest.X - _gameState.Soldier.X) < 30 && Math.Abs(_gameState.Chest.Y - _gameState.Soldier.Y) < 30 && !_gameState.Chest.IsDestroyed)
+            if (_gameState.Soldier != null && Math.Abs(_gameState.Chest.X - _gameState.Soldier.X) < 30 && Math.Abs(_gameState.Chest.Y - _gameState.Soldier.Y) < 30) //&& !_gameState.Chest.IsDestroyed)
             {
                 _gameState.Chest.IsDestroyed = true; // Destroy immediately on touch
                 AwardBonus();
@@ -284,14 +284,10 @@ public class Game
     private void RespawnChest() 
     {
         // 20% chance to respawn a chest
-        if (_random.Next(100) < 20)
+        if (_random.Next(100) < 10)
         {
             _gameState.Chest = new Chest() { X = _random.Next(0, _gameState.ScreenWidth - 25), Y = 50, IsDestroyed = false, Bonus = BonusType.None };
             _logger.LogInformation("Chest respawned");
-        }
-        else
-        {
-         //   _logger.LogInformation("Chest did not respawn this time");
         }
     }
 
@@ -300,18 +296,20 @@ public class Game
         BonusType bonus = (BonusType)_random.Next(1, Enum.GetValues(typeof(BonusType)).Length);
         _gameState.Chest.Bonus = bonus;
         _gameState.ActiveBonus = bonus;
-        _gameState.BonusEndTime = DateTime.Now.AddSeconds(10); // Bonus lasts for 10 seconds
+        _gameState.BonusEndTime = DateTime.Now.AddSeconds(3); // Bonus lasts for 10 seconds
         
         switch (bonus)
         {
             case BonusType.PowerSoldier:
                 _gameState.Message = "Bonus: Power Soldier!";
+                Console.WriteLine("Bonus: Power Soldier!");
                 break;
             case BonusType.PowerfullWeapon:
                 _gameState.Message = "Bonus: Powerful Weapon!";
+                Console.WriteLine("Bonus: Powerful Weapon!");
                 break;
             default:
-                _gameState.Message = "Bonus received!";
+                _gameState.Message = "No bonus active!";
                 break;
         }
         Task.Delay(3000).ContinueWith(_ => _gameState.Message = "");
