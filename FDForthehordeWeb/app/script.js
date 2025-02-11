@@ -6,8 +6,8 @@ const gameTimeElement = document.getElementById('game-time');
 const startGameButton = document.getElementById('start-game-button');
 const messageElement = document.getElementById('game-message');
 
-//const apiurl = 'https://hordeapi-csexhfc9ekdda2ej.swedencentral-01.azurewebsites.net';
-const apiurl = 'http://localhost:5105';
+const apiurl = 'https://hordeapi-csexhfc9ekdda2ej.swedencentral-01.azurewebsites.net';
+//const apiurl = 'http://localhost:5105';
 
 
 let gameState = null;
