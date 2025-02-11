@@ -6,8 +6,8 @@ const gameTimeElement = document.getElementById('game-time');
 const startGameButton = document.getElementById('start-game-button');
 const messageElement = document.getElementById('game-message');
 
-const apiurl = 'https://hordeapi-csexhfc9ekdda2ej.swedencentral-01.azurewebsites.net';
-//const apiurl = 'http://localhost:5105';
+//const apiurl = 'https://hordeapi-csexhfc9ekdda2ej.swedencentral-01.azurewebsites.net';
+const apiurl = 'http://localhost:5105';
 
 
 let gameState = null;
@@ -73,7 +73,7 @@ async function startGame() {
         const response = await fetch(`${apiurl}/Game/start`, { method: 'POST' });
         gameState = await response.json();
         // console.log("Game state after starting:", gameState);
-        setCanvasSize(gameState.screenWidth, gameState.screenHeight);
+       // setCanvasSize(gameState.screenWidth, gameState.screenHeight);
         gameLoopRunning = true;
         gameLoop();
         startGameButton.textContent = "Stop Game"; // Change button text to "Stop Game"
@@ -264,10 +264,10 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-function setCanvasSize(screenWidth, screenHeight) {
-    canvas.width = screenWidth;
-    canvas.height = screenHeight;
-}
-
-// Initial canvas size setup (optional - can be set in HTML)
-setCanvasSize(300, 600);
+// function setCanvasSize(screenWidth, screenHeight) {
+//     canvas.width = screenWidth;
+//     canvas.height = screenHeight;
+// }
+//
+// // Initial canvas size setup (optional - can be set in HTML)
+// setCanvasSize(300, 400);
