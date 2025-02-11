@@ -12,6 +12,8 @@ public class Game
     private static bool _gameLoopRunning = false;
     private static ILogger _logger; // Logger instance
     private static readonly object _gameStateLock = new object(); // Lock object for gameState
+    private static DateTime _chestRespawnCooldownEndTime = DateTime.MinValue; // Initialize to past date
+
 
     // Constructor to inject ILoggerFactory
     public Game(ILoggerFactory loggerFactory)
@@ -262,32 +264,41 @@ public class Game
     {
         lock(_gameStateLock)
         {
-            // _logger.LogInformation("Handling chest interaction");
-
-            // --- "Touch" based interaction ---
             // Check for overlap (adjust the proximity range - e.g., 30 pixels)
-            if (_gameState.Soldier != null && Math.Abs(_gameState.Chest.X - _gameState.Soldier.X) < 30 && Math.Abs(_gameState.Chest.Y - _gameState.Soldier.Y) < 30) //&& !_gameState.Chest.IsDestroyed)
+            if (_gameState.Soldier != null && Math.Abs(_gameState.Chest.X - _gameState.Soldier.X) < 30 && Math.Abs(_gameState.Chest.Y - _gameState.Soldier.Y) < 30 && !_gameState.Chest.IsDestroyed)
             {
                 _gameState.Chest.IsDestroyed = true; // Destroy immediately on touch
                 AwardBonus();
-                _logger.LogInformation("Chest touched and destroyed, bonus awarded");
-                RespawnChest(); // Call RespawnChest immediately after awarding bonus
+                // _logger.LogInformation("Chest touched and destroyed, bonus awarded");
+                _chestRespawnCooldownEndTime = DateTime.Now.AddSeconds(3); // Set cooldown period for respawn
             }
             else if (_gameState.Chest.Y > _gameState.ScreenHeight && !_gameState.Chest.IsDestroyed)
             {
-                RespawnChest(); // Respawn if chest goes off-screen (as before)
-                _logger.LogInformation("Chest respawned due to off-screen");
+                _gameState.Chest.IsDestroyed = true; // Mark chest as destroyed if it goes off-screen
+                _chestRespawnCooldownEndTime = DateTime.Now.AddSeconds(3); // Set cooldown period for respawn
+                //_logger.LogInformation("Chest respawned due to off-screen");
+            }
+
+            // Check if cooldown period has ended and respawn chest if needed
+            if (_gameState.Chest.IsDestroyed && DateTime.Now > _chestRespawnCooldownEndTime)
+            {
+                RespawnChest();
             }
         }
     }
 
     private void RespawnChest() 
     {
+        int minSpawnX = 25; // Minimum X for horde spawn (25 from left edge)
+        int maxSpawnX = _gameState.ScreenWidth - 25; // Maximum X (25 from right edge)
+        int spawnableWidth = maxSpawnX - minSpawnX;
+        
         // 20% chance to respawn a chest
-        if (_random.Next(100) < 10)
+        if (_random.Next(100) < 20)
         {
-            _gameState.Chest = new Chest() { X = _random.Next(0, _gameState.ScreenWidth - 25), Y = 50, IsDestroyed = false, Bonus = BonusType.None };
-            _logger.LogInformation("Chest respawned");
+            _gameState.Chest = new Chest() { X = _random.Next(0, spawnableWidth), IsDestroyed = false, Bonus = BonusType.None };
+            // _logger.LogInformation("RespawnChest(): Chest respawned SUCCESSFULLY! X:{maxSpawnX}, Y:{minSpawnX}", maxSpawnX, minSpawnX); // Log spawn coordinates
+
         }
     }
 
@@ -320,7 +331,7 @@ public class Game
         if (_gameState.ActiveBonus != BonusType.None && DateTime.Now > _gameState.BonusEndTime)
         {
             _gameState.ActiveBonus = BonusType.None; // Reset bonus after expiration
-            _logger.LogInformation("Bonus expired");
+            // _logger.LogInformation("Bonus expired");
         }
 
         switch (_gameState.ActiveBonus)

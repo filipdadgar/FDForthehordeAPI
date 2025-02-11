@@ -18,7 +18,7 @@ chestImg.src = 'chest.png';
 
 
 const apiurl = 'https://hordeapi-csexhfc9ekdda2ej.swedencentral-01.azurewebsites.net';
-//const apiurl = 'http://localhost:5105';
+// const apiurl = 'http://localhost:5105';
 
 
 let gameState = null;

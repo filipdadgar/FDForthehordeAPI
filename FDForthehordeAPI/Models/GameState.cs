@@ -17,7 +17,6 @@ public class GameState
     public List<Shot> Shots { get; set; } = new List<Shot>();
     
     public BonusType ActiveBonus { get; set; }
-    
     public DateTime BonusEndTime { get; set; } // Track bonus expiration time
 
 }
