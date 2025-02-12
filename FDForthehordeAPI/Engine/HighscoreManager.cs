@@ -28,7 +28,7 @@ public class HighscoreManager
     {
         string json = JsonSerializer.Serialize(_highscores);
         File.WriteAllText(_highscoreFilePath, json);
-        Console.WriteLine("Highscores saved to file in this directory: " + _highscoreFilePath);
+        // Console.WriteLine("Highscores saved to file in this directory: " + _highscoreFilePath);
     }
     
     public List<Highscore> GetHighscores()
@@ -38,8 +38,21 @@ public class HighscoreManager
     
     public void AddHighscore(Highscore highscore)
     {
-        if (_highscores != null) _highscores.Add(highscore);
-        SaveHighscores();
+        if (_highscores == null)
+        {
+            _highscores = new List<Highscore>();
+        }
+
+        if (_highscores.Count < 10 || highscore.TotalKills > _highscores.Min(h => h.TotalKills))
+        {
+            _highscores.Add(highscore);
+            SortHighscores();
+            if (_highscores.Count > 10)
+            {
+                _highscores = _highscores.Take(10).ToList();
+            }
+            SaveHighscores();
+        }
     }
     
     public void SortHighscores()
